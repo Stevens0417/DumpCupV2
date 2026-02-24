@@ -1,0 +1,13 @@
+# Build Plan Docs
+
+This folder is the execution playbook for building Dump Cup.
+
+Claude rule:
+Before implementing any new feature, read:
+1) 01_Build_Strategy_Admin_First.md
+2) 02_Phase_Checklists.md
+3) The relevant phase spec file
+
+This folder describes WHAT to build and in WHAT ORDER.
+Engineering implementation details live in /docs/04_Engineering.
+Data details live in /docs/03_Data.
