@@ -21,6 +21,7 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can manage admins | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Admins can read admins | cmd=SELECT | roles=authenticated | using=is_admin() | with_check=(none)
+app_admins_self_read | cmd=SELECT | roles=authenticated | using=(user_id = auth.uid()) | with_check=(none)
 
 ### Triggers
 (none)
@@ -63,6 +64,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write awards | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read awards | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 awards_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -100,6 +115,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write gallery images | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read gallery images | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 gallery_images_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -143,6 +172,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write match players | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read match players | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 match_players_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -181,6 +224,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write match type allocations | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read match type allocations | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 match_type_allocations_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -218,6 +275,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write match types | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read match types | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 match_types_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -277,6 +348,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write matches | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read matches | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 matches_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -312,6 +397,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write players | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read players | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 players_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -359,6 +458,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write rosters | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read rosters | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 rosters_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -389,6 +502,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write seasons | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read seasons | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 seasons_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -426,6 +553,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write teams | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read teams | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 teams_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -471,6 +612,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write tournament entries | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read tournament entries | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 tournament_entries_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -507,6 +662,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write tournament position points | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read tournament position points | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 tournament_position_points_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()
@@ -545,6 +714,20 @@ rls_enabled=t; rls_forced=f
 ### Policies
 Admins can write tournaments | cmd=ALL | roles=authenticated | using=is_admin() | with_check=is_admin()
 Public can read tournaments | cmd=SELECT | roles=anon,authenticated | using=true | with_check=(none)
+admin_delete | cmd=DELETE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_insert | cmd=INSERT | roles=authenticated | using=(none) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
+admin_select | cmd=SELECT | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(none)
+admin_update | cmd=UPDATE | roles=authenticated | using=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid()))) | with_check=(EXISTS ( SELECT 1
+   FROM app_admins a
+  WHERE (a.user_id = auth.uid())))
 
 ### Triggers
 tournaments_set_updated_at | BEFORE UPDATE | EXECUTE FUNCTION set_updated_at()

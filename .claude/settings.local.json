@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx next lint)",
+      "Bash(ls .env*)",
+      "Bash(ls src/app/\\\\\\(admin\\\\\\)/)",
+      "Bash(ls src/app/\\\\\\(public\\\\\\)/)",
+      "Bash(ls \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/admin/\")",
+      "Bash(npx next lint --no-cache)",
+      "Bash(npm install @supabase/ssr)",
+      "Bash(node -e \"require\\(''zod''\\); console.log\\(''ok''\\)\")"
+    ]
+  }
+}
