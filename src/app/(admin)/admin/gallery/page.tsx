@@ -1,8 +1,25 @@
-export default function AdminGalleryPage() {
+import { listSeasons } from '@/lib/db/seasons'
+import { listGalleryImages } from '@/lib/db/gallery'
+import GalleryClient from './GalleryClient'
+
+export default async function AdminGalleryPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const rawFilter = typeof searchParams.season === 'string' ? searchParams.season : 'all'
+  const seasonId = rawFilter === 'all' ? null : rawFilter
+
+  const [seasons, images] = await Promise.all([
+    listSeasons(),
+    listGalleryImages(seasonId),
+  ])
+
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold">Gallery</h1>
-      <p className="text-gray-400 text-sm mt-2">Admin form coming in Phase C.</p>
-    </div>
+    <GalleryClient
+      seasons={seasons}
+      selectedFilter={rawFilter}
+      images={images}
+    />
   )
 }

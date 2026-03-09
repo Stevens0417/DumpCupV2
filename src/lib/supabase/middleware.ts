@@ -52,12 +52,12 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Already-authenticated admin visiting login → send to dashboard
+  // Already-authenticated admin visiting login → send to players
   if (isLoginPath && user) {
     const admin = await isUserAdmin(supabase, user)
     if (admin) {
       const url = request.nextUrl.clone()
-      url.pathname = '/admin/dashboard'
+      url.pathname = '/admin/players'
       return NextResponse.redirect(url)
     }
   }

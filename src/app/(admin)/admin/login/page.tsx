@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
     }
 
     // Step 3: confirmed admin — proceed
-    router.push('/admin/dashboard')
+    router.push('/admin/players')
     router.refresh()
   }
 

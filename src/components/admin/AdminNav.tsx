@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin/dashboard' },
   { label: 'Players', href: '/admin/players' },
   { label: 'Teams', href: '/admin/teams' },
   { label: 'Draft', href: '/admin/draft' },
@@ -26,7 +25,7 @@ export default function AdminNav() {
           key={href}
           href={href}
           className={`flex-shrink-0 px-4 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
-            pathname === href
+            pathname.startsWith(href)
               ? 'border-white text-white'
               : 'border-transparent text-gray-400 hover:text-white'
           }`}

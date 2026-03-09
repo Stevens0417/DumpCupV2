@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "npx tsx src/lib/domain/handicaps/__tests__/calcTeamHandicap.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

@@ -19,11 +19,10 @@ type Props = {
 
 type FormState = { error?: string; success?: boolean }
 
-function equalWeights(n: number): string[] {
-  const base = Math.floor((1 / n) * 10000) / 10000
-  const weights = Array(n - 1).fill(base.toFixed(4))
-  weights.push((1.0 - base * (n - 1)).toFixed(4))
-  return weights
+function defaultWeights(n: number): string[] {
+  if (n === 2) return ['0.35', '0.15']
+  const equal = (1 / n).toFixed(4)
+  return Array(n).fill(equal)
 }
 
 const inputClass =
@@ -70,7 +69,7 @@ export default function MatchTypesClient({ matchTypes, selectedMt, allocations }
     const weights: string[] = []
     for (let i = 1; i <= selectedMt.players_per_team; i++) {
       const alloc = allocations.find((a) => a.rank_order === i)
-      weights.push(alloc ? String(alloc.percentage_weight) : '0')
+      weights.push(alloc ? String(alloc.percentage_weight) : defaultWeights(selectedMt.players_per_team)[i - 1])
     }
     setAllocWeights(weights)
     setAllocState({})
@@ -131,11 +130,6 @@ export default function MatchTypesClient({ matchTypes, selectedMt, allocations }
       rank_order: i + 1,
       percentage_weight: parseFloat(w) || 0,
     }))
-    const sum = rows.reduce((s, r) => s + r.percentage_weight, 0)
-    if (Math.abs(sum - 1.0) > 0.0001) {
-      setAllocState({ error: `Weights sum to ${sum.toFixed(4)} — must equal 1.0` })
-      return
-    }
     startTransition(async () => {
       const result = await saveAllocationsAction(selectedMt.id, rows)
       if ('error' in result) {
@@ -146,9 +140,6 @@ export default function MatchTypesClient({ matchTypes, selectedMt, allocations }
       }
     })
   }
-
-  const allocSum = allocWeights.reduce((s, w) => s + (parseFloat(w) || 0), 0)
-  const sumOk = Math.abs(allocSum - 1.0) <= 0.0001
 
   return (
     <div className="space-y-10 max-w-2xl">
@@ -358,12 +349,12 @@ export default function MatchTypesClient({ matchTypes, selectedMt, allocations }
         )}
       </section>
 
-      {/* ── Allocation Weights Editor ── */}
+      {/* ── Handicap Weights Editor ── */}
       {selectedMt && (
         <section>
           <div className="flex items-center gap-3 mb-3">
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              Weights — {selectedMt.name}
+              Handicap Weights — {selectedMt.name}
             </h2>
             <Link
               href="/admin/match-types"
@@ -372,71 +363,68 @@ export default function MatchTypesClient({ matchTypes, selectedMt, allocations }
               ✕ Close
             </Link>
           </div>
-          <p className="text-xs text-gray-500 mb-3">
-            {selectedMt.players_per_team} rank{selectedMt.players_per_team > 1 ? 's' : ''} · each
-            weight must be &gt; 0 · sum must equal 1.0
-          </p>
 
-          <div className="space-y-2 mb-4">
-            {allocWeights.map((w, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-16 flex-shrink-0">Rank {i + 1}</span>
-                <input
-                  type="number"
-                  step="0.0001"
-                  min="0"
-                  max="1"
-                  value={w}
-                  onChange={(e) => {
-                    const next = [...allocWeights]
-                    next[i] = e.target.value
-                    setAllocWeights(next)
+          {selectedMt.players_per_team === 1 ? (
+            <p className="text-gray-500 text-sm">
+              Singles format — no rank weights needed. Handicap allowance applies directly.
+            </p>
+          ) : (
+            <>
+              <p className="text-xs text-gray-500 mb-4">
+                Rank 1 = lowest handicap on the team. Each weight is multiplied into the team
+                handicap calculation. No sum requirement.
+              </p>
+
+              <div className="space-y-2 mb-4">
+                {allocWeights.map((w, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400 w-16 flex-shrink-0">Rank {i + 1}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={w}
+                      onChange={(e) => {
+                        const next = [...allocWeights]
+                        next[i] = e.target.value
+                        setAllocWeights(next)
+                        setAllocState({})
+                      }}
+                      className="w-32 bg-gray-800 border border-white/10 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/30"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {allocState.error && (
+                <p className="text-red-400 text-xs mb-2">{allocState.error}</p>
+              )}
+              {allocState.success && (
+                <p className="text-green-400 text-xs mb-2">Weights saved.</p>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveAllocations}
+                  disabled={isPending}
+                  className="bg-white text-gray-950 text-sm font-semibold px-4 py-2 rounded hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                >
+                  Save Weights
+                </button>
+                <button
+                  onClick={() => {
+                    setAllocWeights(defaultWeights(selectedMt.players_per_team))
                     setAllocState({})
                   }}
-                  className="w-32 bg-gray-800 border border-white/10 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/30"
-                />
+                  type="button"
+                  disabled={isPending}
+                  className="text-sm text-gray-400 hover:text-white px-4 py-2 rounded border border-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
+                >
+                  Reset to Defaults
+                </button>
               </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 mb-3">
-            <span
-              className={`text-xs font-mono ${
-                sumOk ? 'text-green-400' : 'text-red-400'
-              }`}
-            >
-              Sum: {allocSum.toFixed(4)}
-            </span>
-            {!sumOk && <span className="text-xs text-red-400">must equal 1.0</span>}
-          </div>
-
-          {allocState.error && (
-            <p className="text-red-400 text-xs mb-2">{allocState.error}</p>
+            </>
           )}
-          {allocState.success && (
-            <p className="text-green-400 text-xs mb-2">Allocations saved.</p>
-          )}
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleSaveAllocations}
-              disabled={isPending}
-              className="bg-white text-gray-950 text-sm font-semibold px-4 py-2 rounded hover:bg-gray-200 disabled:opacity-50 transition-colors"
-            >
-              Save Weights
-            </button>
-            <button
-              onClick={() => {
-                setAllocWeights(equalWeights(selectedMt.players_per_team))
-                setAllocState({})
-              }}
-              type="button"
-              disabled={isPending}
-              className="text-sm text-gray-400 hover:text-white px-4 py-2 rounded border border-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
-            >
-              Reset to Equal
-            </button>
-          </div>
         </section>
       )}
     </div>

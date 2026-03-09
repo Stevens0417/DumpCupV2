@@ -9,7 +9,12 @@
       "Bash(ls \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/admin/\")",
       "Bash(npx next lint --no-cache)",
       "Bash(npm install @supabase/ssr)",
-      "Bash(node -e \"require\\(''zod''\\); console.log\\(''ok''\\)\")"
+      "Bash(node -e \"require\\(''zod''\\); console.log\\(''ok''\\)\")",
+      "Bash(npm run build)",
+      "Bash(npm test)",
+      "Bash(npm run typecheck)",
+      "Bash(cat -n \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2\\\\src\\\\app\\\\\\(admin\\)\\\\admin\\\\tournaments\\\\TournamentSelectorClient.tsx\")",
+      "Bash(npx tsx src/lib/domain/handicaps/__tests__/calcTeamHandicap.test.ts)"
     ]
   }
 }

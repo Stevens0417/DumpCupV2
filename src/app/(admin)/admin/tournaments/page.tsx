@@ -1,8 +1,28 @@
-export default function AdminTournamentsPage() {
+import { redirect } from 'next/navigation'
+import { listSeasons } from '@/lib/db/seasons'
+import { listTournamentsBySeason } from '@/lib/db/tournaments'
+import TournamentSelectorClient from './TournamentSelectorClient'
+
+export default async function AdminTournamentsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const seasons = await listSeasons()
+
+  const rawSeason = typeof searchParams.season === 'string' ? searchParams.season : null
+  if (!rawSeason && seasons.length > 0) {
+    redirect(`/admin/tournaments?season=${seasons[0].id}`)
+  }
+  const selectedSeasonId = rawSeason
+
+  const tournaments = selectedSeasonId ? await listTournamentsBySeason(selectedSeasonId) : []
+
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold">Tournaments</h1>
-      <p className="text-gray-400 text-sm mt-2">Admin form coming in Phase C.</p>
-    </div>
+    <TournamentSelectorClient
+      seasons={seasons}
+      selectedSeasonId={selectedSeasonId}
+      tournaments={tournaments}
+    />
   )
 }

@@ -37,3 +37,14 @@ export async function deleteAllocations(matchTypeId: string): Promise<void> {
     .eq('match_type_id', matchTypeId)
   if (error) throw error
 }
+
+export async function listAllAllocations(): Promise<MatchTypeAllocation[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('match_type_allocations')
+    .select('*')
+    .order('match_type_id')
+    .order('rank_order', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
