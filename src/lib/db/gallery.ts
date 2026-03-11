@@ -1,6 +1,29 @@
 import { createClient } from '@/lib/supabase/server'
 import type { GalleryImage } from '@/types/database'
 
+export type GalleryImageRow = {
+  gallery_image_id: string
+  season_id: string | null
+  season_year: number | null
+  image_url: string
+  thumbnail_url: string
+  position_order: number
+  caption: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function getGalleryImages(): Promise<GalleryImageRow[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('v_gallery_images')
+    .select(
+      'gallery_image_id, season_id, season_year, image_url, thumbnail_url, position_order, caption, created_at, updated_at',
+    )
+  if (error || !data) return []
+  return data
+}
+
 export async function listGalleryImages(seasonId?: string | null): Promise<GalleryImage[]> {
   const supabase = createClient()
   let query = supabase

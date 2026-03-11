@@ -14,7 +14,11 @@
       "Bash(npm test)",
       "Bash(npm run typecheck)",
       "Bash(cat -n \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2\\\\src\\\\app\\\\\\(admin\\)\\\\admin\\\\tournaments\\\\TournamentSelectorClient.tsx\")",
-      "Bash(npx tsx src/lib/domain/handicaps/__tests__/calcTeamHandicap.test.ts)"
+      "Bash(npx tsx src/lib/domain/handicaps/__tests__/calcTeamHandicap.test.ts)",
+      "Bash(find \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2/src/app/\\(public\\)\" -type f)",
+      "Bash(ls -lh \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2/src/app/\\(public\\)/\"*)",
+      "Read(//c/Projects/Dump Cup V2/DumpCupV2/**)",
+      "Bash(ls -lh src/app/\\\\\\(public\\\\\\)/*/page.tsx)"
     ]
   }
 }

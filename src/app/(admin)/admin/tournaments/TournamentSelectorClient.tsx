@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Tournament, Season } from '@/types/database'
 import { setupTournamentAction, editTournamentAction } from './actions'
+import PosterUploader from '@/components/admin/PosterUploader'
 
 type TournamentType = 'kickoff' | 'midseason' | 'yearend'
 
@@ -244,16 +245,11 @@ export default function TournamentSelectorClient({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Poster URL</label>
-                  <input
-                    type="text"
-                    value={posterUrl}
-                    onChange={(e) => setPosterUrl(e.target.value)}
-                    placeholder="https://…"
-                    className="w-full bg-gray-900 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder:text-gray-600"
-                  />
-                </div>
+                <PosterUploader
+                  currentUrl={posterUrl || null}
+                  tournamentType={panel.type}
+                  onUpload={(url) => setPosterUrl(url)}
+                />
 
                 <div className="flex gap-3 pt-1">
                   <button

@@ -9,6 +9,7 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Tournament, TournamentEntry, Player, Team } from '@/types/database'
+import PosterUploader from '@/components/admin/PosterUploader'
 import { lookupPointsForPosition } from '@/lib/domain/tournamentPoints'
 import {
   createTournamentAction,
@@ -49,6 +50,7 @@ function MetaForm({
   isEdit,
   isPending,
   error,
+  tournamentType,
   onSubmit,
   onCancel,
 }: {
@@ -56,6 +58,7 @@ function MetaForm({
   isEdit: boolean
   isPending: boolean
   error: string | null
+  tournamentType: TournamentType
   onSubmit: (date: string, course: string, posterUrl: string) => void
   onCancel: () => void
 }) {
@@ -92,13 +95,10 @@ function MetaForm({
           />
         </div>
         <div className="sm:col-span-2">
-          <label className="block text-xs text-gray-400 mb-1">Poster URL (optional)</label>
-          <input
-            type="url"
-            value={posterUrl}
-            onChange={(e) => setPosterUrl(e.target.value)}
-            placeholder="https://…"
-            className="bg-gray-700 border border-white/20 rounded px-3 py-2 text-sm text-white w-full"
+          <PosterUploader
+            currentUrl={posterUrl || null}
+            tournamentType={tournamentType}
+            onUpload={(url) => setPosterUrl(url)}
           />
         </div>
       </div>
@@ -616,6 +616,7 @@ export default function TournamentPanel({ tournament, seasonId, type, players, t
             isEdit={!!tournament}
             isPending={metaPending}
             error={metaError}
+            tournamentType={type}
             onSubmit={handleMetaSubmit}
             onCancel={() => { setShowMetaForm(false); setMetaError(null) }}
           />

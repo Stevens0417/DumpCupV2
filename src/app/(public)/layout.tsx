@@ -4,7 +4,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <>
       {/* Fixed full-screen background — does not scroll */}
-      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-green-950 via-gray-900 to-gray-950" />
+      <div className="fixed inset-0 -z-10" style={{ backgroundColor: '#0E1A2B' }} />
 
       {/* App shell — fills dynamic viewport height, flex column */}
       <div className="flex flex-col h-[100dvh]">

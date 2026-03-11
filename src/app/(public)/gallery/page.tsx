@@ -1,8 +1,16 @@
-export default function GalleryPage() {
+import PageHeader from '@/components/layout/PageHeader'
+import GalleryGrid from '@/components/gallery/GalleryGrid'
+import { getGalleryImages } from '@/lib/db/gallery'
+
+export default async function GalleryPage() {
+  const images = await getGalleryImages()
+
   return (
-    <div className="px-4 pt-6 pb-4">
-      <h1 className="text-2xl font-bold text-white mb-1">Gallery</h1>
-      <p className="text-gray-400 text-sm">Photos will appear here.</p>
+    <div className="pb-4">
+      <PageHeader title="Gallery" subtitle="Tournament photos" />
+      <div className="px-4">
+        <GalleryGrid images={images} />
+      </div>
     </div>
   )
 }
