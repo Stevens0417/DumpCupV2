@@ -18,7 +18,12 @@
       "Bash(find \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2/src/app/\\(public\\)\" -type f)",
       "Bash(ls -lh \"c:\\\\Projects\\\\Dump Cup V2\\\\DumpCupV2/src/app/\\(public\\)/\"*)",
       "Read(//c/Projects/Dump Cup V2/DumpCupV2/**)",
-      "Bash(ls -lh src/app/\\\\\\(public\\\\\\)/*/page.tsx)"
+      "Bash(ls -lh src/app/\\\\\\(public\\\\\\)/*/page.tsx)",
+      "Bash(find \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)\" -type f)",
+      "Bash(find \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(public\\)\" -type f)",
+      "Bash(find \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)\" -maxdepth 2 -name \"page.tsx\")",
+      "Bash(rm \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/login/page.tsx\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/players/page.tsx\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/awards/page.tsx\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/draft/page.tsx\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/match-types/page.tsx\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/matches/page.tsx\")",
+      "Bash(rmdir \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/login\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/players\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/awards\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/draft\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/match-types\" \"c:/Projects/Dump Cup V2/DumpCupV2/src/app/\\(admin\\)/matches\")"
     ]
   }
 }
