@@ -2,16 +2,24 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Season, Team } from '@/types/database'
+import type { Player, Season, Team } from '@/types/database'
+import { TEAM_NAMES } from '@/lib/validators/teamSchemas'
 import { createTeamAction, updateTeamAction, deleteTeamAction } from './actions'
 
 type Props = {
   seasons: Season[]
   teams: Team[]
+  players: Player[]
   selectedSeasonId: string | null
 }
 
 type FormState = { error?: string; success?: boolean }
+
+const selectClass =
+  'bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30'
+
+const editSelectClass =
+  'bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-white/40'
 
 function ColorSwatch({ hex }: { hex: string | null }) {
   if (!hex) return null
@@ -23,7 +31,7 @@ function ColorSwatch({ hex }: { hex: string | null }) {
   )
 }
 
-export default function TeamsClient({ seasons, teams, selectedSeasonId }: Props) {
+export default function TeamsClient({ seasons, teams, players, selectedSeasonId }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -104,7 +112,7 @@ export default function TeamsClient({ seasons, teams, selectedSeasonId }: Props)
         <select
           value={selectedSeasonId ?? ''}
           onChange={handleSeasonChange}
-          className="bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30"
+          className={selectClass}
         >
           <option value="">— Select a season —</option>
           {seasons.map((s) => (
@@ -129,30 +137,29 @@ export default function TeamsClient({ seasons, teams, selectedSeasonId }: Props)
             </h2>
             <form onSubmit={handleCreate} className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
-                <input
-                  name="name"
-                  type="text"
-                  placeholder="Team name *"
-                  required
-                  className="bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/30"
-                />
-                <input
-                  name="captain_name"
-                  type="text"
-                  placeholder="Captain name"
-                  className="bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/30"
-                />
+                <select name="name" required defaultValue="" className={selectClass}>
+                  <option value="" disabled>Team name *</option>
+                  {TEAM_NAMES.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+                <select name="captain_player_id" defaultValue="" className={selectClass}>
+                  <option value="">— No captain —</option>
+                  {players.map((p) => (
+                    <option key={p.id} value={p.id}>{p.full_name}</option>
+                  ))}
+                </select>
                 <input
                   name="color_primary"
                   type="text"
                   placeholder="Primary #RRGGBB"
-                  className="bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/30"
+                  className={selectClass}
                 />
                 <input
                   name="color_secondary"
                   type="text"
                   placeholder="Secondary #RRGGBB"
-                  className="bg-gray-800 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/30"
+                  className={selectClass}
                 />
               </div>
               {addState.error && <p className="text-red-400 text-xs">{addState.error}</p>}
@@ -181,32 +188,39 @@ export default function TeamsClient({ seasons, teams, selectedSeasonId }: Props)
                     {editingId === team.id ? (
                       <form onSubmit={(e) => handleUpdate(team, e)} className="space-y-2">
                         <div className="grid grid-cols-2 gap-2">
-                          <input
+                          <select
                             name="name"
-                            type="text"
                             defaultValue={team.name}
                             required
-                            className="bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-white/40"
-                          />
-                          <input
-                            name="captain_name"
-                            type="text"
-                            defaultValue={team.captain_name ?? ''}
-                            className="bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-white/40"
-                          />
+                            className={editSelectClass}
+                          >
+                            {TEAM_NAMES.map((n) => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </select>
+                          <select
+                            name="captain_player_id"
+                            defaultValue={team.captain_player_id ?? ''}
+                            className={editSelectClass}
+                          >
+                            <option value="">— No captain —</option>
+                            {players.map((p) => (
+                              <option key={p.id} value={p.id}>{p.full_name}</option>
+                            ))}
+                          </select>
                           <input
                             name="color_primary"
                             type="text"
                             defaultValue={team.color_primary ?? ''}
                             placeholder="#RRGGBB"
-                            className="bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/40"
+                            className={editSelectClass}
                           />
                           <input
                             name="color_secondary"
                             type="text"
                             defaultValue={team.color_secondary ?? ''}
                             placeholder="#RRGGBB"
-                            className="bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/40"
+                            className={editSelectClass}
                           />
                         </div>
                         {editState.error && (

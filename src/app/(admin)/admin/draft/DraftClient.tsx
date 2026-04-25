@@ -41,7 +41,15 @@ export default function DraftClient({ seasons, teams, players, rosters, selected
 
   const selectedSeason = seasons.find((s) => s.id === selectedSeasonId)
   const defaultEffectiveFrom = selectedSeason ? `${selectedSeason.year}-01-01` : ''
-  const today = new Date().toISOString().split('T')[0]
+  const now = new Date()
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+  const rosteredPlayerIds = new Set(
+    rosters.filter((r) => r.effective_to === null).map((r) => r.player_id)
+  )
+  const availablePlayers = players
+    .filter((p) => !rosteredPlayerIds.has(p.id))
+    .sort((a, b) => a.handicap - b.handicap || a.full_name.localeCompare(b.full_name))
 
   useEffect(() => {
     if (addState.success) {
@@ -139,7 +147,7 @@ export default function DraftClient({ seasons, teams, players, rosters, selected
     'bg-gray-800 border border-white/20 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-white/40'
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-8 max-w-5xl">
       {/* Season Selector */}
       <section>
         <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
@@ -163,6 +171,9 @@ export default function DraftClient({ seasons, teams, players, rosters, selected
         <p className="text-gray-500 text-sm">Select a season to manage the draft.</p>
       ) : (
         <>
+          {/* Two-column: form left, available players right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
           {/* Add to Roster Form */}
           <section>
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -280,6 +291,30 @@ export default function DraftClient({ seasons, teams, players, rosters, selected
               </form>
             )}
           </section>
+
+          {/* Available Players */}
+          <section>
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              Available Players
+            </h2>
+            {availablePlayers.length === 0 ? (
+              <p className="text-gray-500 text-sm">All players have been drafted for this season.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {availablePlayers.map((p) => (
+                  <li
+                    key={p.id}
+                    className="bg-gray-900 border border-white/10 rounded px-3 py-2"
+                  >
+                    <span className="text-sm font-medium text-white">{p.full_name}</span>
+                    <span className="text-xs text-gray-500 ml-2">HCP {p.handicap}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          </div>{/* end two-column grid */}
 
           {/* Rosters grouped by team */}
           <section className="space-y-6">

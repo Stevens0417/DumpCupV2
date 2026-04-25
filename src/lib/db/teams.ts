@@ -16,6 +16,7 @@ export async function createTeam(input: {
   season_id: string
   name: string
   captain_name: string | null
+  captain_player_id: string | null
   color_primary: string | null
   color_secondary: string | null
 }): Promise<Team> {
@@ -30,6 +31,7 @@ export async function updateTeam(
   input: {
     name: string
     captain_name: string | null
+    captain_player_id: string | null
     color_primary: string | null
     color_secondary: string | null
   }

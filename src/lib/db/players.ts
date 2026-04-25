@@ -57,3 +57,10 @@ export async function setPlayerActive(id: string, is_active: boolean): Promise<v
   const { error } = await supabase.from('players').update({ is_active }).eq('id', id)
   if (error) throw error
 }
+
+export async function getPlayerById(id: string): Promise<Player | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('players').select('*').eq('id', id).maybeSingle()
+  if (error) throw error
+  return data
+}

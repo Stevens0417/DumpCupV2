@@ -14,12 +14,17 @@ const nullableHex = z.preprocess(
   ])
 )
 
+export const TEAM_NAMES = ['Dresden', 'York'] as const
+export type TeamName = (typeof TEAM_NAMES)[number]
+
 export const teamSchema = z.object({
-  name: z.preprocess(
-    (val) => (typeof val === 'string' ? val.trim().replace(/\s+/g, ' ') : val),
-    z.string().min(2, 'Name must be at least 2 characters').max(40, 'Name too long')
+  name: z.enum(TEAM_NAMES, {
+    errorMap: () => ({ message: 'Team name must be Dresden or York' }),
+  }),
+  captain_player_id: z.preprocess(
+    trimOrNull,
+    z.string().uuid('Invalid player ID').nullable()
   ),
-  captain_name: z.preprocess(trimOrNull, z.string().max(60, 'Captain name too long').nullable()),
   color_primary: nullableHex,
   color_secondary: nullableHex,
 })
