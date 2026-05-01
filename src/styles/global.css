@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * PWA safe-area utilities.
+ *
+ * These classes are inert in normal browser mode and activate only when the
+ * app runs in standalone (installed PWA) mode. Two activation paths:
+ *
+ *  1. CSS: @media (display-mode: standalone)
+ *     Works on iOS 13+ and all modern Android PWAs.
+ *
+ *  2. JS fallback: body.is-standalone
+ *     Set by StandaloneDetector.tsx via window.navigator.standalone (iOS <13).
+ *     Also set as a belt-and-suspenders duplicate on iOS 13+.
+ */
+
+@media (display-mode: standalone) {
+  .pwa-pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .pwa-pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+body.is-standalone .pwa-pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+body.is-standalone .pwa-pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
