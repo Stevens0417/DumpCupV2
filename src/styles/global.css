@@ -5,24 +5,31 @@
 /*
  * PWA safe-area utilities.
  *
- * These classes are inert in normal browser mode and activate only when the
- * app runs in standalone (installed PWA) mode. Two activation paths:
+ * Classes are completely inert in normal browser/Safari mode.
+ * They activate only in PWA standalone mode via two paths:
  *
- *  1. CSS: @media (display-mode: standalone)
- *     Works on iOS 13+ and all modern Android PWAs.
+ *  1. @media (display-mode: standalone)  — CSS, works iOS 13+
+ *  2. body.is-standalone                 — JS fallback set by StandaloneDetector.tsx
+ *                                          for iOS Safari where navigator.standalone
+ *                                          is true but the media query may not fire
  *
- *  2. JS fallback: body.is-standalone
- *     Set by StandaloneDetector.tsx via window.navigator.standalone (iOS <13).
- *     Also set as a belt-and-suspenders duplicate on iOS 13+.
+ * WHY fixed positioning for the nav:
+ *   On iOS, `100dvh` in standalone mode resolves to the *safe* viewport height,
+ *   which excludes env(safe-area-inset-bottom). This means the flex container's
+ *   bottom edge sits ~34px above the physical screen bottom, leaving a visible
+ *   gap between the nav and the home indicator.
+ *   `position: fixed; bottom: 0` anchors the nav to the real screen edge,
+ *   bypassing the 100dvh quirk entirely.
  */
+
+/* ── Top safe area ─────────────────────────────────────────────────────────── */
+/* Pushes content below the Dynamic Island / notch in standalone mode.         */
+/* In browser Safari, env(safe-area-inset-top) is already handled by the       */
+/* browser chrome, so this class has no visible effect there.                  */
 
 @media (display-mode: standalone) {
   .pwa-pt-safe {
     padding-top: env(safe-area-inset-top);
-  }
-
-  .pwa-pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -30,6 +37,37 @@ body.is-standalone .pwa-pt-safe {
   padding-top: env(safe-area-inset-top);
 }
 
-body.is-standalone .pwa-pb-safe {
+/* ── Bottom nav — fixed to real screen bottom ──────────────────────────────── */
+/* In standalone: fixes nav to bottom: 0 and pads for home indicator.          */
+/* In browser: class has no rules — nav stays a normal flex-shrink-0 child.    */
+
+@media (display-mode: standalone) {
+  .pwa-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Pads scrollable content so it isn't hidden behind the fixed nav.          */
+  /* 5rem = h-20 (the nav's inner content height). Add safe-area-inset-bottom  */
+  /* because the fixed nav itself is that tall at the screen bottom.            */
+  .pwa-pb-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+body.is-standalone .pwa-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+body.is-standalone .pwa-pb-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }

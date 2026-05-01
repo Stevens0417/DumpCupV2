@@ -23,7 +23,7 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="flex-shrink-0 bg-gray-950/95 backdrop-blur-md border-t border-white/10 pwa-pb-safe">
+    <nav className="flex-shrink-0 bg-gray-950/95 backdrop-blur-md border-t border-white/10 pwa-bottom-nav">
       <div className="flex items-center justify-around h-20 px-1">
         {LEFT_ITEMS.map(({ href, label, src }) => (
           <Link

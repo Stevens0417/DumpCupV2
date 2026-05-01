@@ -22,7 +22,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
          * Has no effect in normal browser Safari (env() returns 0 there because
          * the browser chrome already accounts for the status bar).
          */}
-        <main className="flex-1 overflow-y-auto pwa-pt-safe">
+        <main className="flex-1 overflow-y-auto pwa-pt-safe pwa-pb-nav">
           {children}
         </main>
 
