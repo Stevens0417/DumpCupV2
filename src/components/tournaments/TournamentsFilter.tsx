@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react'
 import type {
   TournamentSummaryRow,
   KickoffResultRow,
+  KickoffParticipantRow,
+  PositionPointsPublicRow,
   TournamentMatchResultRow,
   TournamentMatchPlayerRow,
 } from '@/lib/db/tournaments'
@@ -20,7 +22,6 @@ const TYPE_LABELS: Record<TournamentType, string> = {
 
 const ALL_TYPES: TournamentType[] = ['kickoff', 'midseason', 'yearend']
 
-// yearend = most important, kickoff = least — used as tiebreaker when dates are equal or null
 const TYPE_PRIORITY: Record<TournamentType, number> = {
   yearend: 0,
   midseason: 1,
@@ -48,6 +49,9 @@ type TournamentMeta = {
 type Props = {
   summaries: TournamentSummaryRow[]
   kickoffRows: KickoffResultRow[]
+  kickoffParticipants: KickoffParticipantRow[]
+  positionPointsRows: PositionPointsPublicRow[]
+  tournamentStatuses: Record<string, string>
   matchResults: TournamentMatchResultRow[]
   matchPlayers: TournamentMatchPlayerRow[]
   seasonYears: number[]
@@ -56,11 +60,13 @@ type Props = {
 export default function TournamentsFilter({
   summaries,
   kickoffRows,
+  kickoffParticipants,
+  positionPointsRows,
+  tournamentStatuses,
   matchResults,
   matchPlayers,
   seasonYears,
 }: Props) {
-  // Default to most recent tournament by date, yearend preferred on ties
   const [selectedYear, setSelectedYear] = useState<number>(() => {
     const sorted = [...summaries].sort(latestFirst)
     return sorted[0]?.season_year ?? (seasonYears[0] ?? new Date().getFullYear())
@@ -71,7 +77,6 @@ export default function TournamentsFilter({
     return sorted[0]?.tournament_type ?? 'yearend'
   })
 
-  // Build tournament metadata map keyed by tournament_id
   const tournamentMeta = useMemo(() => {
     const map = new Map<string, TournamentMeta>()
     for (const row of summaries) {
@@ -94,7 +99,6 @@ export default function TournamentsFilter({
     return map
   }, [summaries])
 
-  // Types that exist for the selected year
   const typesForYear = useMemo(() => {
     const set = new Set<TournamentType>()
     for (const meta of tournamentMeta.values()) {
@@ -103,7 +107,6 @@ export default function TournamentsFilter({
     return set
   }, [tournamentMeta, selectedYear])
 
-  // When year changes, keep type if available, else switch to most recent for that year
   function handleYearChange(year: number) {
     setSelectedYear(year)
     const typesInYear = [...tournamentMeta.values()]
@@ -117,7 +120,6 @@ export default function TournamentsFilter({
     }
   }
 
-  // Find selected tournament
   const selectedTournament = useMemo(() => {
     for (const meta of tournamentMeta.values()) {
       if (meta.season_year === selectedYear && meta.tournament_type === selectedType) return meta
@@ -125,11 +127,24 @@ export default function TournamentsFilter({
     return null
   }, [tournamentMeta, selectedYear, selectedType])
 
-  // Filter data to selected tournament
+  const selectedStatus = selectedTournament
+    ? (tournamentStatuses[selectedTournament.tournament_id] ?? 'complete')
+    : 'complete'
+
   const filteredKickoffRows = useMemo(() => {
     if (!selectedTournament || selectedType !== 'kickoff') return []
     return kickoffRows.filter((r) => r.tournament_id === selectedTournament.tournament_id)
   }, [kickoffRows, selectedTournament, selectedType])
+
+  const filteredParticipants = useMemo(() => {
+    if (!selectedTournament || selectedType !== 'kickoff') return []
+    return kickoffParticipants.filter((p) => p.tournament_id === selectedTournament.tournament_id)
+  }, [kickoffParticipants, selectedTournament, selectedType])
+
+  const filteredPositionPoints = useMemo(() => {
+    if (!selectedTournament) return []
+    return positionPointsRows.filter((p) => p.tournament_id === selectedTournament.tournament_id)
+  }, [positionPointsRows, selectedTournament])
 
   const filteredMatchResults = useMemo(() => {
     if (!selectedTournament || selectedType === 'kickoff') return []
@@ -208,7 +223,10 @@ export default function TournamentsFilter({
           />
           <ResultsTable
             tournamentType={selectedType}
+            tournamentStatus={selectedStatus}
             kickoffRows={filteredKickoffRows}
+            kickoffParticipants={filteredParticipants}
+            positionPoints={filteredPositionPoints}
             matchResults={filteredMatchResults}
             matchPlayers={filteredMatchPlayers}
           />

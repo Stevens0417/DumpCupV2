@@ -1,5 +1,7 @@
 import type {
   KickoffResultRow,
+  KickoffParticipantRow,
+  PositionPointsPublicRow,
   TournamentMatchResultRow,
   TournamentMatchPlayerRow,
 } from '@/lib/db/tournaments'
@@ -7,6 +9,73 @@ import type {
 function fmt(n: number | null | undefined): string {
   if (n == null) return '—'
   return Number.isInteger(n) ? String(n) : n.toFixed(1)
+}
+
+// ── Kickoff setup (pre-results) ───────────────────────────────────────────────
+
+function KickoffSetupTable({
+  participants,
+  positionPoints,
+}: {
+  participants: KickoffParticipantRow[]
+  positionPoints: PositionPointsPublicRow[]
+}) {
+  return (
+    <div className="space-y-5">
+      {/* Participating players */}
+      <div>
+        <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Competing Players
+        </h3>
+        {participants.length === 0 ? (
+          <p className="text-xs text-gray-500 py-3 text-center">
+            Players will be announced soon.
+          </p>
+        ) : (
+          <table className="w-full text-xs min-w-[240px]">
+            <thead>
+              <tr className="text-gray-500 border-b border-white/10">
+                <th className="text-left py-2 pr-2 font-medium">Player</th>
+                <th className="text-left py-2 pr-2 font-medium">Team</th>
+                <th className="text-right py-2 font-medium w-12">HCP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...participants]
+                .sort((a, b) => a.player_name.localeCompare(b.player_name))
+                .map((p) => (
+                  <tr key={p.player_id} className="border-b border-white/5 last:border-0">
+                    <td className="py-2 pr-2 text-white font-medium">{p.player_name}</td>
+                    <td className="py-2 pr-2 text-gray-400">{p.team_name ?? '—'}</td>
+                    <td className="py-2 text-right text-gray-400 tabular-nums">{p.handicap}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Position points */}
+      {positionPoints.length > 0 && (
+        <div>
+          <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Points Available
+          </h3>
+          <div className="grid grid-cols-2 gap-1">
+            {positionPoints.map((pp) => (
+              <div
+                key={pp.finish_position}
+                className="flex justify-between text-xs px-2.5 py-1.5 bg-white/5 rounded"
+              >
+                <span className="text-gray-400">Position {pp.finish_position}</span>
+                <span className="text-white font-semibold tabular-nums">{pp.points} pts</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── Kickoff leaderboard ───────────────────────────────────────────────────────
@@ -186,24 +255,35 @@ function MatchCards({
 
 type Props = {
   tournamentType: 'kickoff' | 'midseason' | 'yearend'
+  tournamentStatus: string
   kickoffRows: KickoffResultRow[]
+  kickoffParticipants: KickoffParticipantRow[]
+  positionPoints: PositionPointsPublicRow[]
   matchResults: TournamentMatchResultRow[]
   matchPlayers: TournamentMatchPlayerRow[]
 }
 
 export default function ResultsTable({
   tournamentType,
+  tournamentStatus,
   kickoffRows,
+  kickoffParticipants,
+  positionPoints,
   matchResults,
   matchPlayers,
 }: Props) {
+  const isSetup = tournamentType === 'kickoff' && tournamentStatus === 'setup'
+  const heading = isSetup ? 'Tournament Preview' : 'Results'
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
       <div className="px-4 py-3 border-b border-white/10">
-        <h2 className="text-sm font-semibold text-gray-200">Results</h2>
+        <h2 className="text-sm font-semibold text-gray-200">{heading}</h2>
       </div>
       <div className="p-4">
-        {tournamentType === 'kickoff' ? (
+        {isSetup ? (
+          <KickoffSetupTable participants={kickoffParticipants} positionPoints={positionPoints} />
+        ) : tournamentType === 'kickoff' ? (
           <KickoffTable rows={kickoffRows} />
         ) : (
           <MatchCards matchResults={matchResults} matchPlayers={matchPlayers} />

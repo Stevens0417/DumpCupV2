@@ -97,6 +97,7 @@ export type Tournament = {
   id: string
   season_id: string
   type: 'kickoff' | 'midseason' | 'yearend'
+  status: string
   tournament_date: string | null
   course: string | null
   poster_url: string | null

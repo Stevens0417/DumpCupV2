@@ -6,6 +6,7 @@ import {
   updateTournament,
   deleteTournament,
   getTournamentBySeasonAndType,
+  setTournamentStatus,
 } from '@/lib/db/tournaments'
 import {
   listPositionPoints,
@@ -238,11 +239,71 @@ export async function saveAllTournamentEntriesAction(
 ): Promise<ActionResult> {
   try {
     await replaceAllTournamentEntries(tournamentId, rows)
+    const allHaveScores = rows.length > 0 && rows.every((r) => r.gross_score !== null)
+    await setTournamentStatus(tournamentId, allHaveScores ? 'complete' : 'setup')
     revalidatePath('/admin/tournaments/kickoff')
     revalidatePath('/admin/tournaments')
+    revalidatePath('/tournaments')
     return { success: true }
   } catch {
     return { error: 'Failed to save entries.' }
+  }
+}
+
+// ── Kickoff setup save ───────────────────────────────────────────────────────
+
+type KickoffSetupMeta = {
+  tournament_date: string
+  course: string | null
+  poster_url: string | null
+}
+
+type KickoffSetupPlayer = {
+  player_id: string
+  team_id: string | null
+  handicap_used: number
+}
+
+type KickoffSetupPoints = {
+  finish_position: number
+  points: number
+}
+
+export async function saveKickoffSetupAction(
+  tournamentId: string,
+  meta: KickoffSetupMeta,
+  players: KickoffSetupPlayer[],
+  positionPoints: KickoffSetupPoints[]
+): Promise<ActionResult> {
+  try {
+    await updateTournament(tournamentId, {
+      tournament_date: meta.tournament_date,
+      course: meta.course,
+      poster_url: meta.poster_url,
+    })
+
+    await replaceAllTournamentEntries(
+      tournamentId,
+      players.map((p) => ({
+        player_id: p.player_id,
+        team_id: p.team_id,
+        gross_score: null,
+        handicap_used: p.handicap_used,
+        net_score: null,
+        finish_position: null,
+        points_awarded: null,
+      })),
+    )
+
+    await upsertPositionPoints(tournamentId, positionPoints)
+    await setTournamentStatus(tournamentId, 'setup')
+
+    revalidatePath('/admin/tournaments/kickoff')
+    revalidatePath('/admin/tournaments')
+    revalidatePath('/tournaments')
+    return { success: true }
+  } catch {
+    return { error: 'Failed to save tournament setup.' }
   }
 }
 

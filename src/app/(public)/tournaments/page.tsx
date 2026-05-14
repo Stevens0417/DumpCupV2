@@ -3,17 +3,24 @@ import TournamentsFilter from '@/components/tournaments/TournamentsFilter'
 import {
   getTournamentSummaryAllSeasons,
   getKickoffResultsAllSeasons,
+  getKickoffParticipantsAllSeasons,
+  getPositionPointsAllSeasons,
+  getAllTournamentStatuses,
   getTournamentMatchResultsAllSeasons,
   getTournamentMatchPlayersAllSeasons,
 } from '@/lib/db/tournaments'
 
 export default async function TournamentsPage() {
-  const [summaries, kickoffRows, matchResults, matchPlayers] = await Promise.all([
-    getTournamentSummaryAllSeasons(),
-    getKickoffResultsAllSeasons(),
-    getTournamentMatchResultsAllSeasons(),
-    getTournamentMatchPlayersAllSeasons(),
-  ])
+  const [summaries, kickoffRows, kickoffParticipants, positionPointsRows, tournamentStatuses, matchResults, matchPlayers] =
+    await Promise.all([
+      getTournamentSummaryAllSeasons(),
+      getKickoffResultsAllSeasons(),
+      getKickoffParticipantsAllSeasons(),
+      getPositionPointsAllSeasons(),
+      getAllTournamentStatuses(),
+      getTournamentMatchResultsAllSeasons(),
+      getTournamentMatchPlayersAllSeasons(),
+    ])
 
   const seasonYears = [...new Set(summaries.map((r) => r.season_year))].sort((a, b) => b - a)
 
@@ -23,6 +30,9 @@ export default async function TournamentsPage() {
       <TournamentsFilter
         summaries={summaries}
         kickoffRows={kickoffRows}
+        kickoffParticipants={kickoffParticipants}
+        positionPointsRows={positionPointsRows}
+        tournamentStatuses={tournamentStatuses}
         matchResults={matchResults}
         matchPlayers={matchPlayers}
         seasonYears={seasonYears}

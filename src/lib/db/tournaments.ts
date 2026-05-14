@@ -87,6 +87,12 @@ export async function updateTournament(
   return row
 }
 
+export async function setTournamentStatus(id: string, status: string): Promise<void> {
+  const supabase = createClient()
+  const { error } = await supabase.from('tournaments').update({ status }).eq('id', id)
+  if (error) throw error
+}
+
 export async function deleteTournament(id: string): Promise<void> {
   const supabase = createClient()
 
@@ -234,6 +240,82 @@ export async function getTournamentMatchResultsAllSeasons(): Promise<TournamentM
     team_b_points: d.team_b_points != null ? Number(d.team_b_points) : null,
     match_points: d.match_points != null ? Number(d.match_points) : null,
   }))
+}
+
+export async function getAllTournamentStatuses(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data, error } = await supabase.from('tournaments').select('id, status')
+  if (error) throw error
+  return Object.fromEntries((data ?? []).map((t) => [t.id, t.status]))
+}
+
+// ── Setup-mode public queries ─────────────────────────────────────────────────
+
+export type KickoffParticipantRow = {
+  tournament_id: string
+  season_year: number
+  player_id: string
+  player_name: string
+  team_id: string | null
+  team_name: string | null
+  handicap: number
+}
+
+export async function getKickoffParticipantsAllSeasons(): Promise<KickoffParticipantRow[]> {
+  const supabase = createClient()
+
+  // Find all kickoff tournaments in 'setup' status
+  const { data: tournaments, error: te } = await supabase
+    .from('tournaments')
+    .select('id, season_id, seasons!inner(year)')
+    .eq('type', 'kickoff')
+    .eq('status', 'setup')
+  if (te) throw te
+  if (!tournaments?.length) return []
+
+  const tournamentIds = tournaments.map((t) => t.id)
+  const seasonYearById = new Map<string, number>(
+    tournaments.map((t) => [t.id, (t.seasons as unknown as { year: number }).year]),
+  )
+
+  // Fetch entries with player + team info
+  const { data: entries, error: ee } = await supabase
+    .from('tournament_entries')
+    .select('tournament_id, player_id, team_id, handicap_used, players!inner(full_name, handicap), teams(name)')
+    .in('tournament_id', tournamentIds)
+    .is('gross_score', null)
+  if (ee) throw ee
+
+  return (entries ?? []).map((e) => {
+    const player = e.players as unknown as { full_name: string; handicap: number }
+    const team = e.teams as unknown as { name: string } | null
+    return {
+      tournament_id: e.tournament_id,
+      season_year: seasonYearById.get(e.tournament_id) ?? 0,
+      player_id: e.player_id,
+      player_name: player.full_name,
+      team_id: e.team_id ?? null,
+      team_name: team?.name ?? null,
+      handicap: (e.handicap_used as number | null) ?? player.handicap,
+    }
+  })
+}
+
+export type PositionPointsPublicRow = {
+  tournament_id: string
+  finish_position: number
+  points: number
+}
+
+export async function getPositionPointsAllSeasons(): Promise<PositionPointsPublicRow[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('tournament_position_points')
+    .select('tournament_id, finish_position, points')
+    .order('tournament_id')
+    .order('finish_position', { ascending: true })
+  if (error) throw error
+  return (data ?? []).map((r) => ({ ...r, points: Number(r.points) }))
 }
 
 export async function getTournamentMatchPlayersAllSeasons(): Promise<TournamentMatchPlayerRow[]> {

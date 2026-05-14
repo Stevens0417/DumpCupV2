@@ -5,6 +5,7 @@ import { listTeamsBySeason } from '@/lib/db/teams'
 import { getTournamentById } from '@/lib/db/tournaments'
 import { getPlayersWithTeams } from '@/lib/db/tournamentUtils'
 import { listTournamentEntries } from '@/lib/db/tournamentEntries'
+import { listPositionPoints } from '@/lib/db/tournamentPositionPoints'
 import KickoffClient from './KickoffClient'
 
 function NotSetUp({ seasonId }: { seasonId: string }) {
@@ -41,15 +42,16 @@ export default async function KickoffPage({
 
   const today = new Date().toISOString().split('T')[0]
 
-  const [tournament, playersWithTeams, teams] = await Promise.all([
-    getTournamentById(rawTournamentId),
-    getPlayersWithTeams(seasonId, today),
-    listTeamsBySeason(seasonId),
-  ])
+  const [tournament, playersWithTeams, teams, initialEntries, initialPositionPoints] =
+    await Promise.all([
+      getTournamentById(rawTournamentId),
+      getPlayersWithTeams(seasonId, today),
+      listTeamsBySeason(seasonId),
+      listTournamentEntries(rawTournamentId),
+      listPositionPoints(rawTournamentId),
+    ])
 
   if (!tournament) return <NotSetUp seasonId={seasonId} />
-
-  const initialEntries = await listTournamentEntries(tournament.id)
 
   return (
     <KickoffClient
@@ -59,6 +61,7 @@ export default async function KickoffPage({
       playersWithTeams={playersWithTeams}
       teams={teams}
       initialEntries={initialEntries}
+      initialPositionPoints={initialPositionPoints}
     />
   )
 }
