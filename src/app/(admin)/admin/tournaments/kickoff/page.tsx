@@ -42,16 +42,19 @@ export default async function KickoffPage({
 
   const today = new Date().toISOString().split('T')[0]
 
-  const [tournament, playersWithTeams, teams, initialEntries, initialPositionPoints] =
-    await Promise.all([
-      getTournamentById(rawTournamentId),
-      getPlayersWithTeams(seasonId, today),
-      listTeamsBySeason(seasonId),
-      listTournamentEntries(rawTournamentId),
-      listPositionPoints(rawTournamentId),
-    ])
-
+  const tournament = await getTournamentById(rawTournamentId)
   if (!tournament) return <NotSetUp seasonId={seasonId} />
+
+  // Use the tournament's own date for roster lookup so trades are handled correctly.
+  // Fall back to today only if the tournament has no date yet (brand-new setup).
+  const rosterDate = tournament.tournament_date ?? today
+
+  const [playersWithTeams, teams, initialEntries, initialPositionPoints] = await Promise.all([
+    getPlayersWithTeams(seasonId, rosterDate),
+    listTeamsBySeason(seasonId),
+    listTournamentEntries(rawTournamentId),
+    listPositionPoints(rawTournamentId),
+  ])
 
   return (
     <KickoffClient
