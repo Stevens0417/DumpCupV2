@@ -269,6 +269,11 @@ type KickoffSetupPoints = {
   points: number
 }
 
+function extractErrorMessage(e: unknown): string {
+  if (e && typeof e === 'object' && 'message' in e) return String((e as { message: unknown }).message)
+  return String(e)
+}
+
 export async function saveKickoffSetupAction(
   tournamentId: string,
   meta: KickoffSetupMeta,
@@ -281,7 +286,11 @@ export async function saveKickoffSetupAction(
       course: meta.course,
       poster_url: meta.poster_url,
     })
+  } catch (e) {
+    return { error: `Failed to update tournament details: ${extractErrorMessage(e)}` }
+  }
 
+  try {
     await replaceAllTournamentEntries(
       tournamentId,
       players.map((p) => ({
@@ -294,17 +303,26 @@ export async function saveKickoffSetupAction(
         points_awarded: null,
       })),
     )
-
-    await upsertPositionPoints(tournamentId, positionPoints)
-    await setTournamentStatus(tournamentId, 'setup')
-
-    revalidatePath('/admin/tournaments/kickoff')
-    revalidatePath('/admin/tournaments')
-    revalidatePath('/tournaments')
-    return { success: true }
-  } catch {
-    return { error: 'Failed to save tournament setup.' }
+  } catch (e) {
+    return { error: `Failed to save player entries: ${extractErrorMessage(e)}` }
   }
+
+  try {
+    await upsertPositionPoints(tournamentId, positionPoints)
+  } catch (e) {
+    return { error: `Failed to save position points: ${extractErrorMessage(e)}` }
+  }
+
+  try {
+    await setTournamentStatus(tournamentId, 'setup')
+  } catch (e) {
+    return { error: `Failed to update tournament status: ${extractErrorMessage(e)}` }
+  }
+
+  revalidatePath('/admin/tournaments/kickoff')
+  revalidatePath('/admin/tournaments')
+  revalidatePath('/tournaments')
+  return { success: true }
 }
 
 // ── Convenience: load full tournament data ───────────────────────────────────
