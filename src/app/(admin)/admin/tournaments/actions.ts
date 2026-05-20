@@ -300,7 +300,7 @@ export async function saveKickoffSetupAction(
         handicap_used: p.handicap_used,
         net_score: null,
         finish_position: null,
-        points_awarded: null,
+        points_awarded: 0,
       })),
     )
   } catch (e) {
